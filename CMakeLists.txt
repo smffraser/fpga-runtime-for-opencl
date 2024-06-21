@@ -215,6 +215,22 @@ if(ACL_TSAN)
   endforeach()
 endif()
 
+#add_compile_definitions(__FILE__='\"$(subst ${CMAKE_SOURCE_DIR}/,,$(abspath $<))\"')
+#set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -D__FILENAME__='\"$(subst
+#  ${CMAKE_SOURCE_DIR}/,,$(abspath $<))\"'")
+
+function(define_file_basename_for_sources targetname)
+    get_target_property(source_files "${targetname}" SOURCES)
+    foreach(sourcefile ${source_files})
+        # Add the FILE_BASENAME=filename compile definition to the list.
+        get_filename_component(basename "${sourcefile}" NAME)
+        # Set the updated compile definitions on the source file.
+        set_property(
+            SOURCE "${sourcefile}" APPEND
+            PROPERTY COMPILE_DEFINITIONS "__FILE__=\"${basename}\"")
+    endforeach()
+endfunction()
+
 include(CPack)
 include(CTest)
 
